@@ -61,21 +61,29 @@ const onSort = (): void => {
 const onExportToXlsx = (): void => {
   const wb = utils.book_new();
 
+  const headerRow = [
+    { v: "#", t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+    { v: "First Name", t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+    { v: "Last Name", t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+    { v: "Book Title", t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+    { v: "Publish Year", t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+  ]
+
   const preparedBooksList = props.books.map(
     ({ title, author_name, first_publish_year }, index) => {
       const first_name = author_name ? author_name[0].split(" ")[0] : "";
       const last_name = author_name ? author_name[0].split(" ")[1] : "";
 
-      return {
-        "#": index + 1,
-        "First Name": first_name,
-        "Last Name": last_name,
-        "Book Title": title,
-        "Publish Year": first_publish_year ?? "",
-      };
+      return [
+        { v: `${index + 1}`, t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+        { v: `${first_name}`, t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+        { v: `${last_name}`, t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+        { v: `${title ?? ''}`, t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+        { v: `${first_publish_year ?? ""}`, t: "s", s: { alignment: { vertical: "center", horizontal:'center' } } },
+      ]
     }
   );
-  const ws = utils.json_to_sheet(preparedBooksList);
+  const ws = utils.aoa_to_sheet([headerRow,...preparedBooksList]);
 
   utils.book_append_sheet(wb, ws);
   writeFile(wb, "books-list.xlsx");
